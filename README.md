@@ -16,8 +16,8 @@ And then edit your .env files
 prisma generate --schema
 yarn introspect
 
-yarn offline 
-yarn deploy:staging
+yarn offline  ## or
+yarn deploy:staging ## or
 yarn deploy:production
 ```
 
