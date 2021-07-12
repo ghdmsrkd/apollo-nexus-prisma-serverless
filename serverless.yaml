@@ -1,0 +1,51 @@
+service: auctionok-pre
+
+plugins:
+  - "serverless-plugin-typescript"
+  - serverless-offline
+  - serverless-dotenv-plugin
+
+package:
+  patterns:
+    - "!node_modules/.prisma/client/query-engine-*"
+    - "!node_modules/.prisma/client/libquery_engine-*"
+    - "node_modules/.prisma/client/libquery_engine-rhel-openssl-1.0.x.so.node"
+    - "node_modules/.prisma/client/query-engine-rhel-openssl-1.0.x"
+    - "!node_modules/prisma/*"
+    - "!node_modules/@prisma/engines/*"
+
+provider:
+  name: aws
+  runtime: nodejs14.x
+  region: ap-northeast-2
+  iamRoleStatements:
+    - Effect: "Allow"
+      Action:
+        - "logs:CreateLogGroup"
+        - "logs:CreateLogStream"
+        - "logs:PutLogEvents"
+        - "ec2:CreateNetworkInterface"
+        - "ec2:DescribeNetworkInterfaces"
+        - "ec2:DeleteNetworkInterface"
+        - "ec2:AssignPrivateIpAddresses"
+        - "ec2:UnassignPrivateIpAddresses"
+      Resource: "*"
+  vpc:
+    securityGroupIds:
+      - ${env:SECURITY_GROUP_ID}
+    subnetIds:
+      - ${env:SUBNET_ID_PRIMARY}
+      - ${env:SUBNET_ID_SECONDARY}
+
+functions:
+  graphql:
+    handler: app.graphqlHandler
+    events:
+      - http:
+          path: graphql
+          method: post
+          cors: true
+      - http:
+          path: graphql
+          method: get
+          cors: true
